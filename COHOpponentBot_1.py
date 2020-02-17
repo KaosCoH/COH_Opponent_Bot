@@ -87,9 +87,9 @@ class IRCClient(threading.Thread):
 		self.running = True
 		
 
-		# Start checking send buffer every 3 seconds.
+		# Start checking send buffer every 0.61 seconds.
 
-		self.CheckIRCSendBufferEveryThreeSeconds() # only call this once.	
+		self.CheckIRCSendBufferEvery061Second() # only call this once.	
 		
 
 		self.irc.connect((self.server, self.port))
@@ -151,7 +151,7 @@ class IRCClient(threading.Thread):
 						#cancel auto closing the thread
 						timeoutTimer.cancel()
 						self.output.insert(END, "Joined "+self.channel+" successfully.\n")
-						self.output.insert(END, "You can type 'test' in the " +self.channel[1:]+ " channel to say hello!\n")
+						self.output.insert(END, "You can type '!bot' in the " +self.channel[1:]+ " channel to say hello!\n")
 
 					if(line[0]=="PING"):
 						self.irc.send(("PONG %s\r\n" % line[0]).encode("utf8"))
@@ -178,9 +178,9 @@ class IRCClient(threading.Thread):
 		if not os.path.exists(dir):
 			os.makedirs(dir)
 					
-	def CheckIRCSendBufferEveryThreeSeconds(self):
+	def CheckIRCSendBufferEvery061Second(self):
 		if (self.running == True): 
-			threading.Timer(3.0, self.CheckIRCSendBufferEveryThreeSeconds).start()
+			threading.Timer(0.61, self.CheckIRCSendBufferEvery061Second).start()
 		self.IRCSendCalledEveryThreeSeconds()
 	# above is the send to IRC timer loop that runs every three seconds
 	
@@ -253,15 +253,120 @@ class IRC_Channel(threading.Thread):
 
 
 	def CheckForUserCommand(self, userName, message):
-		if (bool(re.match("^(!)?opponent(\?)?$", message.lower())) or bool(re.match("^(!)?place your bets$" , message.lower())) or bool(re.match("^(!)?opp(\?)?$", message.lower()))):
+		if (bool(re.match("^(!)?!opponent(\?)?$", message.lower())) or bool(re.match("^(!)?place your bets$" , message.lower()))):
 			self.myHandleCOHlogFile = HandleCOHlogFile()
 			returnedList =  self.myHandleCOHlogFile.loadLog()
 			if returnedList:
 				for item in returnedList:
 					self.parent.SendPrivateMessageToIRC(str(item))
-		if (message.lower() == "test") and ((str(userName).lower() == str(self.parameters.privatedata.get('adminUserName')).lower()) or (str(userName) == str(self.parameters.data.get('channel')).lower())):
+					
+		if (message.lower() == "!bot") and ((str(userName).lower() == str(self.parameters.privatedata.get('adminUserName')).lower()) or (str(userName) == str(self.parameters.data.get('channel')).lower())):
 			self.parent.SendPrivateMessageToIRC("I'm here! Pls give me mod to prevent twitch from autobanning me for spam if I have to send a few messages quickly.")
 			self.parent.output.insert(END, "Oh hi again, I heard you in the " +self.channel[1:] + " channel.\n")
+			
+		if(message.lower() == '!afk'):
+			self.parent.SendPrivateMessageToIRC("Kaos is getting :candy: and :beer: , stay tuned!")
+			
+		if(message.split(' ')[0].lower() == "!dick"):
+			counter = ''
+			try:
+				if(int(message.split(' ')[1]) > 10):
+					dicksize = '10'
+				else:
+					dicksize = message.split(' ')[1]
+				for i in range(int(dicksize)):
+					counter += '='
+					
+				self.parent.SendPrivateMessageToIRC("8" + counter + "D")
+						
+			except ValueError:
+				self.parent.SendPrivateMessageToIRC("Correct usage: !dick [number]")
+			
+		#based on ascii values of the second char in username to avoid inconsistency
+		elif(message.split(' ')[0].lower() == '!dicksize'):
+			try:
+				vs = ''
+				firstusersize = userName[1]
+				seconduser = message.split(' ')[2].lower()
+				secondusersize = message.split(' ')[2][1]
+				vs = message.split(' ')[1].lower()
+				
+				if(vs == "vs" or vs == ''):
+					#kaos penis size
+					if ("kaos" in seconduser.lower() or userName.lower() == "kaoscoh"):
+						self.parent.SendPrivateMessageToIRC("Kaos has the biggest dick in this twitch chat!")
+								
+					#elnur penis size
+					elif("elnur" in userName.lower() or "elnur" in seconduser.lower()):
+						self.parent.SendPrivateMessageToIRC("Elnur has the smallest penis cause he has a micropenis!")
+							
+					elif(firstusersize > secondusersize):
+						self.parent.SendPrivateMessageToIRC(userName + " has a bigger dick than " + seconduser + " !")
+								
+					else:
+						self.parent.SendPrivateMessageToIRC(userName + " has a smaller dick than " + seconduser + " !")
+				else:
+					self.parent.SendPrivateMessageToIRC("How can you even measure it if you are so blind that you wrote the command wrong!")
+			except IndexError:
+				self.parent.SendPrivateMessageToIRC("How can you even measure it if you are so blind that you wrote the command wrong!")
+				
+		#based on ascii values of the first char in username to avoid inconsistency
+		elif(message.split(' ')[0].lower() == "!incelmeter"):
+			try:
+				incel = message.split(' ')[1].lower()
+				incelratingStr = incel[0].lower()
+				incelrating = ord(incelratingStr)
+				
+				#if kaos
+				if("kaos" in incel.lower()):
+					self.parent.SendPrivateMessageToIRC("Ask your mom how you were created Kappa ")
+				
+				#if a number
+				elif(incelrating < 58 and incelrating > 47):
+					self.parent.SendPrivateMessageToIRC(userName + " broke the incel meter, because it was fucked by + " + userName + ", proving that " + userName + "is not an incel.")
+				
+				#a to c
+				elif(incelrating >= 96 and incelrating <= 99):
+					self.parent.SendPrivateMessageToIRC("The meter shows 1/10, meaning this person had sex for the first time around the age of 7, most probably with a local nun PogChamp ")
+					
+				#d to e
+				elif(incelrating >= 100 and incelrating <= 101):
+					self.parent.SendPrivateMessageToIRC("The meter shows 2/10, meaning this person is able to make a gay person straight and then fuck it, twice a day Kappa ")
+					
+				#f to h
+				elif(incelrating >= 102 and incelrating <= 104):
+					self.parent.SendPrivateMessageToIRC("The meter shows 3/10, meaning that when this person says: 'I fucked your mom kid', it actually did that OpieOP ")
+					
+				#i to j
+				elif(incelrating >= 105 and incelrating <= 106):
+					self.parent.SendPrivateMessageToIRC("The meter shows 4/10, meaning that this person had to google 'incel' to know what it means. Too busy with sex to be botherer to learn before MVGame ")
+					
+				#k to m
+				elif(incelrating >= 107 and incelrating <= 109):
+					self.parent.SendPrivateMessageToIRC("The meter shows 5/10, traces of incels in the family genome spotted monkaS monkaS monkaS ")
+					
+				#n to o
+				elif(incelrating >= 110 and incelrating <= 111):
+					self.parent.SendPrivateMessageToIRC("The meter shows 6/10, meaning this person had sex, once, with a goat NotLikeThis ")
+					
+				#p to q
+				elif(incelrating >= 112 and incelrating <= 113):
+					self.parent.SendPrivateMessageToIRC("The meter shows 7/10, meaning this person doesn't give a fuck and also doesn't recieve one BibleThump ")
+					
+				#r to t
+				elif(incelrating >= 114 and incelrating <= 116):
+					self.parent.SendPrivateMessageToIRC("The meter shows 8/10, meaning this person doesn't have sex even while dreaming LUL ")
+					
+				#u to w
+				elif(incelrating >= 117 and incelrating <= 119):
+					self.parent.SendPrivateMessageToIRC("The meter shows 9/10, meaning that you should fucking run if you see this person with a gun 4Head ")
+					
+				#x to z
+				elif(incelrating >= 120 and incelrating <= 122):
+					self.parent.SendPrivateMessageToIRC("The meter shows 10/10, meaning this person is a godforsaken incel that won't even have sex with the virgins in heaven after the kaboom ANELE ")
+					
+			except IndexError:
+				self.parent.SendPrivateMessageToIRC("Correct usage !incelmeter [username]")
 
 	def close(self):
 		self.running = False
@@ -690,13 +795,22 @@ class HandleCOHlogFile:
 	def populateStringFormattingDictionary(self, playerStats, overlay = False):
 		prefixDiv = ""
 		postfixDivClose = ""
+		namePrefix = '<div id = "nickname">'
+		rankPrefix = '<div id = "rank">'
 		if overlay:
 			prefixDiv = '<div id = "textVariables">'
 			postfixDivClose = '</div>'
 		stringFormattingDictionary = self.parameters.stringFormattingDictionary
-		stringFormattingDictionary['$NAME$'] =  prefixDiv + str(playerStats.user.name) + postfixDivClose
+		stringFormattingDictionary['$NAME$'] =  namePrefix + str(playerStats.user.name) + postfixDivClose
 		if type(playerStats.user.faction) is Faction:
-			stringFormattingDictionary['$FACTION$'] =  prefixDiv + str(playerStats.user.faction.name) + postfixDivClose
+			if(str(playerStats.user.faction.name) == "CW"):
+				stringFormattingDictionary['$FACTION$'] =  rankPrefix + "Commonwealth" + postfixDivClose
+			elif(str(playerStats.user.faction.name) == "WM"):
+				stringFormattingDictionary['$FACTION$'] =  rankPrefix + "Wehrmacht" + postfixDivClose
+			elif(str(playerStats.user.faction.name) == "US"):
+				stringFormattingDictionary['$FACTION$'] =  rankPrefix + "Americans" + postfixDivClose
+			elif(str(playerStats.user.faction.name) == "PE"):
+				stringFormattingDictionary['$FACTION$'] =  rankPrefix + "Panzer Elite" + postfixDivClose
 		stringFormattingDictionary['$COUNTRY$'] =  prefixDiv + str(playerStats.user.country) + postfixDivClose
 		stringFormattingDictionary['$TOTALWINS$'] =  prefixDiv + str(playerStats.totalWins) + postfixDivClose
 		stringFormattingDictionary['$TOTALLOSSES$'] =  prefixDiv + str(playerStats.totalLosses) + postfixDivClose
@@ -725,7 +839,7 @@ class HandleCOHlogFile:
 					stringFormattingDictionary['$DISPUTES$'] =  prefixDiv + str(playerStats.leaderboardData[value].disputes) + postfixDivClose
 					stringFormattingDictionary['$STREAK$'] =  prefixDiv + str(playerStats.leaderboardData[value].streak) + postfixDivClose
 					stringFormattingDictionary['$DROPS$'] =  prefixDiv + str(playerStats.leaderboardData[value].drops) + postfixDivClose
-					stringFormattingDictionary['$RANK$'] =  prefixDiv + str(playerStats.leaderboardData[value].rank) + postfixDivClose
+					stringFormattingDictionary['$RANK$'] =  rankPrefix + str(playerStats.leaderboardData[value].rank) + postfixDivClose
 					stringFormattingDictionary['$LEVEL$'] =  prefixDiv + str(playerStats.leaderboardData[value].rankLevel) + postfixDivClose
 					stringFormattingDictionary['$WLRATIO$'] =  prefixDiv + str(playerStats.leaderboardData[value].winLossRatio) + postfixDivClose
 					 
@@ -779,10 +893,10 @@ class HandleCOHlogFile:
 					print("levelIcon : " + str(levelIcon))
 					fileExists = os.path.isfile(levelIcon)
 					if fileExists:
-						imageOverlayFormattingDictionary['$LEVELICON$'] =  '<div id = "rankimg"><img src="{0}" height = "45"></div>'.format(levelIcon)
+						imageOverlayFormattingDictionary['$LEVELICON$'] =  '<div id = "ranking"><img src="{0}" height = "45"></div>'.format(levelIcon)
 						print(imageOverlayFormattingDictionary.get('$LEVELICON$'))
 					else:
-						imageOverlayFormattingDictionary['$LEVELICON$'] = '<div id = "rankimg"><img height = "45"></div>'
+						imageOverlayFormattingDictionary['$LEVELICON$'] = '<div id = "ranking"><img height = "45"></div>'
 		return imageOverlayFormattingDictionary
 
 	def formatPreFormattedString(self, theString, stringFormattingDictionary, overlay = False):
@@ -899,7 +1013,7 @@ class HandleCOHlogFile:
 		
 		try:
 			if (factionData.nameShort):
-				output += ":- " + str(factionData.nameShort)
+				output += "- " + str(factionData.nameShort)
 			if (self.parameters.data.get('showWins')):
 				output += " : Wins " + str(factionData.wins)
 			if (self.parameters.data.get('showLosses')):

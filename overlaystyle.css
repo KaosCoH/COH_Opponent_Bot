@@ -24,13 +24,23 @@ body {
 }
 
 
-#rankimg {
+#ranking {
 		position: relative;
 		top: 10px;
 		display: inline;
 }
 
-#textVariables {
+#nickname {
+	position: relative;
+	display: inline-block;
+	top: 3px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 20ch;
+}
+
+#rank {
 	position: relative;
 	display: inline;
 	top: -3px;
@@ -50,7 +60,7 @@ body {
 	  float: left;
 	  margin-left: 58%;
 	  background-color: rgba(0, 0, 0, 0.8);
-	  }
+	}
   
 #playerTeam {
 
@@ -59,10 +69,8 @@ body {
 	  color: white;
 	  float: right;
 	  margin-right: 58%;
-
-
 	  background-color: rgba(0, 0, 0, 0.8);
-  }
+	}
   
   
 
