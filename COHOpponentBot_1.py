@@ -323,7 +323,7 @@ class IRC_Channel(threading.Thread):
 				
 				#if a number
 				elif(incelrating < 58 and incelrating > 47):
-					self.parent.SendPrivateMessageToIRC(userName + " broke the incel meter, because it was fucked by + " + userName + ", proving that " + userName + "is not an incel.")
+					self.parent.SendPrivateMessageToIRC(incel + " broke the incel meter, because it was fucked by " + incel + ", proving that " + incel + " is not an incel.")
 				
 				#a to c
 				elif(incelrating >= 96 and incelrating <= 99):
@@ -795,11 +795,14 @@ class HandleCOHlogFile:
 	def populateStringFormattingDictionary(self, playerStats, overlay = False):
 		prefixDiv = ""
 		postfixDivClose = ""
-		namePrefix = '<div id = "nickname">'
-		rankPrefix = '<div id = "rank">'
+		namePrefix = ""
+		rankPrefix = ""
+		
 		if overlay:
 			prefixDiv = '<div id = "textVariables">'
 			postfixDivClose = '</div>'
+			namePrefix = '<div id = "nickname">'
+			rankPrefix = '<div id = "rank">'
 		stringFormattingDictionary = self.parameters.stringFormattingDictionary
 		stringFormattingDictionary['$NAME$'] =  namePrefix + str(playerStats.user.name) + postfixDivClose
 		if type(playerStats.user.faction) is Faction:
