@@ -220,7 +220,7 @@ class IRC_Channel(threading.Thread):
 			if (line[0] == "EXITTHREAD"):
 				self.close()
 			if (line[0] == "OPPONENT"):
-				self.CheckForUserCommand("self","opp")
+				self.CheckForUserCommand("self","!opponent")
 			if (line[0] == "IWON"):
 				self.parent.SendPrivateMessageToIRC(str(self.parameters.data.get('channel')) +" won")
 			if (line[0] == "ILOST"):
